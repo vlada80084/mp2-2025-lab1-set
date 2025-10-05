@@ -29,28 +29,22 @@ int TSet::GetMaxPower(void) const // получить макс. к-во эл-т�
 
 int TSet::IsMember(const int Elem) const // элемент множества?
 {
-    if ((MaxPower <= Elem) || (Elem < 0))
-    {
-        throw std::out_of_range("The index is wrong");
-    }
+    if ((MaxPower <= Elem) || (Elem < 0)) { throw std::out_of_range("The index is wrong"); }
+
     return BitField.GetBit(Elem); //вернёт 1, если есть в множестве, иначе - 0
 }
 
 void TSet::InsElem(const int Elem) // включение элемента множества
 {
-    if ((MaxPower <= Elem) || (Elem < 0))
-    {
-        throw std::out_of_range("The index is wrong");
-    }
+    if ((MaxPower <= Elem) || (Elem < 0)) { throw std::out_of_range("The index is wrong"); }
+
     BitField.SetBit(Elem);
 }
 
 void TSet::DelElem(const int Elem) // исключение элемента множества
 {
-    if ((MaxPower <= Elem) || (Elem < 0))
-    {
-        throw std::out_of_range("The index is wrong");
-    }
+    if ((MaxPower <= Elem) || (Elem < 0)){ throw std::out_of_range("The index is wrong"); }
+
     BitField.ClrBit(Elem);
 }
 
@@ -58,7 +52,8 @@ void TSet::DelElem(const int Elem) // исключение элемента мн
 
 TSet& TSet::operator=(const TSet &s) // присваивание
 {
-    if (this != &s) {
+    if (this != &s) 
+    {
         MaxPower = s.MaxPower;
         BitField = s.BitField; //оператор = у TBitField
     }
@@ -67,25 +62,15 @@ TSet& TSet::operator=(const TSet &s) // присваивание
 
 int TSet::operator==(const TSet &s) const // сравнение
 {
-    if (MaxPower != s.MaxPower) { //если мощности разные, то множества не равны
-        return false;
-    }
-    if (BitField == s.BitField) { //оператор == из TBitField
-        return true;
-    }
-    else {
-        return false; //биты различаются в остальных случаях
-    }
+    if (MaxPower != s.MaxPower) { return false; } //если мощности разные, то множества не равны
+
+    if (BitField == s.BitField) { return true; }//оператор == из TBitField
+    else { return false; } //биты различаются в остальных случаях
 }
 
 int TSet::operator!=(const TSet &s) const // сравнение
 {
-    if (*this == s) { //== для TBitField
-        return false;
-    }
-    else {
-        return true;
-    }
+    return !(*this == s);
 }
 
 TSet TSet::operator+(const TSet &s) // объединение

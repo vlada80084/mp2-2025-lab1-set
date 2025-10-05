@@ -101,14 +101,17 @@ int TBitField::operator==(const TBitField &bf) const // сравнение
 {
 	if (BitLen != bf.BitLen) { return false; } //количество значимых битов разное
 	if (MemLen == 0) { return 1; } //у обоих уже одинаковое BitLen, значит, если у одного MemLen = 0,то и у другого тоже
-	for (int i = 0; i < MemLen - 1; i++) { //проверяем полные элементы pMem
+	for (int i = 0; i < MemLen - 1; i++) //проверяем полные элементы pMem
+	{ 
 		if (pMem[i] != bf.pMem[i]) { return false; }
 	}
 	int k = BitLen % (sizeof(TELEM) * 8); //сколько битов осталось в последнем неполном элементе
-	if (k == 0) { //последний элемент заполнен полностью
+	if (k == 0) //последний элемент заполнен полностью
+	{ 
 		if (pMem[MemLen - 1] != bf.pMem[MemLen - 1]) return 0;
 	}
-	else { //последний элемент не полностью заполнен
+	else 
+	{ //последний элемент не полностью заполнен
 		TELEM mask = (1u << k) - 1; //k младших битов обращаются в 1
 		if ((pMem[MemLen - 1] & mask) != (bf.pMem[MemLen - 1] & mask)) return 0; //обнуляем ненужные и сравниваем то, что осталось
 	}
@@ -117,8 +120,7 @@ int TBitField::operator==(const TBitField &bf) const // сравнение
 
 int TBitField::operator!=(const TBitField &bf) const // сравнение
 {
-	if (*this == bf) { return false; }
-	else { return true; }
+	return !(*this == bf);
 }
 
 TBitField TBitField::operator|(const TBitField &bf) // операция "или"
@@ -127,7 +129,8 @@ TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 	if (BitLen > bf.BitLen) { LenOfRes = BitLen; } //выбираем наибольшую длину
 	else { LenOfRes = bf.BitLen; }
 	TBitField result(LenOfRes);
-	for (int i = 0; i < result.MemLen; i++) {
+	for (int i = 0; i < result.MemLen; i++) 
+	{
 		TELEM left = 0;
 		TELEM right = 0;
 		if (i < MemLen) { left = pMem[i]; }
@@ -135,9 +138,10 @@ TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 		result.pMem[i] = left | right;
 	}
 	int k = result.BitLen % (sizeof(TELEM) * 8);
-	if (k != 0) {
+	if (k != 0) //оставляем младшие биты
+	{
 		TELEM mask = (TELEM(1) << k) - 1;
-		result.pMem[result.MemLen - 1] &= mask; //оставляем младшие биты
+		result.pMem[result.MemLen - 1] &= mask; 
 	}
 	return result;
 }
@@ -148,7 +152,8 @@ TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 	if (BitLen > bf.BitLen){ LenOfRes = BitLen; }//выбираем большую длину
 	else { LenOfRes = bf.BitLen; }
 	TBitField result(LenOfRes);
-	for (int i = 0; i < result.MemLen; i++) {
+	for (int i = 0; i < result.MemLen; i++) 
+	{
 		TELEM left = 0;
 		TELEM right = 0;
 		if (i < MemLen){ left = pMem[i]; }
@@ -156,9 +161,10 @@ TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 		result.pMem[i] = left & right;
 	}
 	int k = result.BitLen % (sizeof(TELEM) * 8);
-	if (k != 0) {
+	if (k != 0) //обнуляем лишние старшие биты
+	{
 		TELEM mask = (1u << k) - 1;
-		result.pMem[result.MemLen - 1] &= mask; //обнуляем лишние старшие биты
+		result.pMem[result.MemLen - 1] &= mask; 
 	}
 	return result;
 }
@@ -166,13 +172,14 @@ TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 TBitField TBitField::operator~(void) // отрицание
 {
 	TBitField result(BitLen);
-	for (int i = 0; i < MemLen; i++)
+	for (int i = 0; i < MemLen; i++)//инвертируем каждый элемент pMem по отдельности
 	{
-		result.pMem[i] = ~pMem[i]; //инвертируем каждый элемент pMem по отдельности
+		result.pMem[i] = ~pMem[i]; 
 	}
 	int k = BitLen % (sizeof(TELEM) * 8);
-	if (k != 0) {
-		TELEM mask = (TELEM(1) << k) - 1; //оставляем только младшие биты
+	if (k != 0) //оставляем только младшие биты
+	{
+		TELEM mask = (TELEM(1) << k) - 1; 
 		result.pMem[MemLen - 1] &= mask;
 	}
 	return result;
@@ -185,9 +192,12 @@ istream &operator>>(istream &istr, TBitField &bf) // ввод
 	string s;
 	istr >> s; // читаем строку вида "10101"
 	for (int i = 0; i < bf.BitLen; i++) //обнуляем биты
-		bf.ClrBit(i);
+	{ 
+		bf.ClrBit(i); 
+	}
 	int len = s.length();
-	for (int i = 0; (i < len) && (i < bf.BitLen); i++) { //идем по строке слева направо, заполняем наоборот
+	for (int i = 0; (i < len) && (i < bf.BitLen); i++)  //идем по строке слева направо, заполняем наоборот
+	{
 		if (s[len - i - 1] == '1')
 			bf.SetBit(i);
 	}
@@ -196,7 +206,8 @@ istream &operator>>(istream &istr, TBitField &bf) // ввод
 
 ostream &operator<<(ostream &ostr, const TBitField &bf) // вывод
 {
-	for (int i = bf.BitLen - 1; i >= 0; i--) {
+	for (int i = bf.BitLen - 1; i >= 0; i--) 
+	{
 		ostr << bf.GetBit(i);
 	}
 	return ostr;
